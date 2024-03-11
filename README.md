@@ -7,10 +7,6 @@ It is helpful for bypassing the limitations of the hardcoded Mailgun setup and s
 with the capability to use **multiple** email accounts.
 
 ---
-**Note**: `Ghosler` supports only **one** newsletter at this time. **Please avoid using it if you manage multiple
-active newsletters**.
-
----
 
 ### Screenshots
 
@@ -77,6 +73,11 @@ active newsletters**.
   likes, dislikes, and overall sentiment.
 - **Ghost Native Widgets**: Ghosler supports major Ghost widgets (cards) for your newsletter, out of the box.\
   See: [#17](https://github.com/ItzNotABug/ghosler/pull/17) for more info.
+- **Custom Email Subjects**: Ghosler allows using customised email subject for your newsletter.\
+  See: [#28](https://github.com/ItzNotABug/ghosler/pull/28) for more info.
+- **Multiple Newsletters**: Ghosler supports managing multiple newsletters! Publish a post & select the newsletter to
+  associate with & instantly send emails.\
+  See: [#32](https://github.com/ItzNotABug/ghosler/pull/32) for more info.
 
 ### Running Ghosler
 
@@ -104,7 +105,9 @@ Pre-requisites: `Node 18^` & `pm2` installed.
     - Name the integration (e.g., Newsletters) and click **Add**.
     - **Copy** the **Admin API Key** displayed.
 3. **Configure Ghosler**:
-    - Fire up the Ghosler front-end by going to `https://your-domain.com`. Default `PORT` is `2369`.
+    - Fire up the Ghosler front-end by going to `https://your-domain.com`.
+        - Default `PORT` is `2369`
+        - Default login credentials are - Username: `ghosler`, Password - `admin`
     - Click on **Settings** button.
     - Click on **Ghost Settings** & add your **Ghost Site Url** & **Admin API Key**.
     - Add mail configurations in **Emails** section.
@@ -139,6 +142,12 @@ And use below to run `Ghosler` -
     npm run dev
    ```
 
+You can use below for combining the above commands -
+
+   ```shell
+    npm run cleanstart
+   ```
+
 ### Custom Template
 
 If you want to customize the newsletter template even more, follow the steps -
@@ -148,10 +157,15 @@ If you want to customize the newsletter template even more, follow the steps -
 3. That's it! Ghosler will use the new template for preview & sending newsletter.
 4. Rename the file to anything if you don't want to use the custom template.
 
-### TODOs
+#### Looking for a dockerized solution?
 
-1. Add support for multiple newsletters.
-2. <s>Add feedback support in newsletter template</s>.
-3. <s>Build a `CLI` to install, update & other options to manage Ghosler instance</s>.
+See this [issue](https://github.com/ItzNotABug/ghosler/issues/31), and
+this [comment](https://github.com/ItzNotABug/ghosler/issues/31#issuecomment-1987150626) which mentions an article
+written by **[@viriatusX](https://github.com/viriatusX)** for containerizing Ghosler.
+
+*Please note that due to my limited experience with Docker, I haven't tested this yet. For any issues, feel free to add
+comments on the above linked issue.*
+
+---
 
 #### And don't forget to `⭐` the project!

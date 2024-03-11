@@ -17,6 +17,13 @@ export default class ProjectConfigs {
     static #cachedSettings = {};
 
     /**
+     * Current ghosler version from `package.json` file.
+     *
+     * @type {string}
+     */
+    static ghoslerVersion = '';
+
+    /**
      * Retrieves the Ghosler (Ghost Newsletter Service) configuration.
      *
      * @returns {Promise<Object>} The Ghosler configuration object.
@@ -93,6 +100,8 @@ export default class ProjectConfigs {
      * @throws {Error} If there's an issue reading or parsing the configuration file.
      */
     static async #getConfigs() {
+        this.#fetchGhoslerVersion();
+
         try {
             const configFilePath = await this.#getConfigFilePath();
             const fileContents = await fs.readFile(configFilePath, 'utf8');
@@ -138,8 +147,11 @@ export default class ProjectConfigs {
             configs.ghosler.auth.pass = Miscellaneous.hash(newPass);
 
             const success = await this.#write(configs);
-            if (success) return {level: 'success', message: 'Password updated!'};
-            else return {level: 'error', message: 'Error updating password, check error logs for more info.'};
+            if (success) {
+                // update password in cache.
+                this.#cachedSettings = configs;
+                return {level: 'success', message: 'Password updated!'};
+            } else return {level: 'error', message: 'Error updating password, check error logs for more info.'};
         }
 
         const url = formData['ghosler.url'];
@@ -156,6 +168,7 @@ export default class ProjectConfigs {
         const newsletterShowSubscription = formData['newsletter.show_subscription'];
         const newsletterShowFeaturedImage = formData['newsletter.show_featured_image'];
         const newsletterFooterContent = formData['newsletter.footer_content'];
+        const newsletterCustomSubject = formData['newsletter.custom_subject_pattern'];
         const newsletterPoweredByGhost = formData['newsletter.show_powered_by_ghost'];
         const newsletterPoweredByGhosler = formData['newsletter.show_powered_by_ghosler'];
 
@@ -191,6 +204,7 @@ export default class ProjectConfigs {
         configs.newsletter.show_powered_by_ghost = newsletterPoweredByGhost === 'on' ?? true;
         configs.newsletter.show_powered_by_ghosler = newsletterPoweredByGhosler === 'on' ?? true;
         configs.newsletter.footer_content = newsletterFooterContent;
+        configs.newsletter.custom_subject_pattern = newsletterCustomSubject;
 
         // mail configurations
         configs.mail = [...email.map(({batch_size, delay_per_batch, auth_user, auth_pass, ...rest}) => {
@@ -205,10 +219,12 @@ export default class ProjectConfigs {
             };
         })];
 
-        this.#cachedSettings = configs;
         const success = await this.#write(configs);
-        if (success) return {level: 'success', message: 'Settings updated!'};
-        else return {level: 'error', message: 'Error updating settings, check error logs for more info.'};
+        if (success) {
+            // update the config. cache.
+            this.#cachedSettings = configs;
+            return {level: 'success', message: 'Settings updated!'};
+        } else return {level: 'error', message: 'Error updating settings, check error logs for more info.'};
     }
 
     /**
@@ -245,5 +261,16 @@ export default class ProjectConfigs {
         } catch {
             return prodConfigPath;
         }
+    }
+
+    /**
+     * Updates the {@link ghoslerVersion} from the `package.json` file.
+     */
+    static #fetchGhoslerVersion() {
+        const __dirname = path.dirname(fileURLToPath(import.meta.url));
+        const packageFilePath = path.resolve(__dirname, '../../package.json');
+        fs.readFile(packageFilePath, 'utf8').then(fileContent => {
+            this.ghoslerVersion = JSON.parse(fileContent).version;
+        }).catch((_) => this.ghoslerVersion = '');
     }
 }
