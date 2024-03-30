@@ -1,6 +1,6 @@
 # Build stage
-FROM node:18-alpine
-
+FROM node:18-bookworm-slim
+USER node
 # Label
 LABEL author="@ItzNotABug"
 
